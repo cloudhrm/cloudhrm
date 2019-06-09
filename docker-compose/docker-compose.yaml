@@ -1,0 +1,96 @@
+version: '3'
+
+services:
+  gw:
+    image: treegateway/tree-gateway:latest
+    ports:
+      - '8000:8000'
+      - '8001:8001'
+    environment:
+      - REDIS_PORT_6379_TCP_ADDR=redis
+      - REDIS_PORT_6379_TCP_PORT=6379
+    links:
+      - 'redis:redis'
+  redis:
+    image: redis:3.2.8-alpine
+    ports:
+      - '6379:6379'
+  employee:
+    image: cloudhrm/employee:latest
+    environment:
+      - NODE_ENV=production
+      - PRISMA_CLOUD_SESSION_KEY=$PRISMA_CLOUD_SESSION_KEY
+      - PRISMA_HOST=prisma
+      - PRISMA_PORT=4466
+      - PRISMA_PROT=http
+      - PRISMA_PATH=/employee/dev
+      - CONSUL_HOST=consul
+    links:
+      - 'prisma'
+      - 'consul'
+    ports:
+      - '4001:4001'
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '50m'
+        max-file: '20'
+
+  auth:
+    image: cloudhrm/auth:latest
+    environment:
+      - NODE_ENV=production
+      - PRISMA_CLOUD_SESSION_KEY=$PRISMA_CLOUD_SESSION_KEY
+      - PRISMA_HOST=prisma
+      - PRISMA_PORT=4466
+      - PRISMA_PROT=http
+      - PRISMA_PATH=/auth/dev
+      - CONSUL_HOST=consul
+    links:
+      - 'prisma'
+      - 'consul'
+    ports:
+      - '4000:4000'
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '50m'
+        max-file: '20'
+
+  consul:
+    image: consul
+    environment:
+      - CONSUL_BIND_INTERFACE=eth0
+    ports:
+      - '8500:8500'
+
+  prisma:
+    image: prismagraphql/prisma:1.29
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - '4466:4466'
+    environment:
+      PRISMA_CONFIG: |
+        port: 4466
+        databases:
+          default:
+            connector: postgres
+            host: db
+            port: 5432
+            user: prisma
+            password: prisma
+            migrations: true
+  db:
+    image: postgres:10.3-alpine
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '50m'
+        max-file: '20'

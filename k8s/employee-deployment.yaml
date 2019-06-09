@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.16.0 (0c01309)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: employee
+  name: employee
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: employee
+    spec:
+      containers:
+      - env:
+        - name: CONSUL_HOST
+          value: consul
+        - name: NODE_ENV
+          value: production
+        - name: PRISMA_CLOUD_SESSION_KEY
+        - name: PRISMA_HOST
+          value: prisma
+        - name: PRISMA_PATH
+          value: /employee/dev
+        - name: PRISMA_PORT
+          value: "4466"
+        - name: PRISMA_PROT
+          value: http
+        image: cloudhrm/employee:latest
+        name: employee
+        ports:
+        - containerPort: 4001
+        resources: {}
+      restartPolicy: Always
+status: {}

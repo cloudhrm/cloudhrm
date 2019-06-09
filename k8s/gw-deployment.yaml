@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.16.0 (0c01309)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: gw
+  name: gw
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: gw
+    spec:
+      containers:
+      - env:
+        - name: REDIS_PORT_6379_TCP_ADDR
+          value: redis
+        - name: REDIS_PORT_6379_TCP_PORT
+          value: "6379"
+        image: treegateway/tree-gateway:latest
+        name: gw
+        ports:
+        - containerPort: 8000
+        - containerPort: 8001
+        resources: {}
+      restartPolicy: Always
+status: {}

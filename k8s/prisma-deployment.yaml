@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.16.0 (0c01309)
+  creationTimestamp: null
+  labels:
+    app: auth
+    service: prisma
+    version: v1
+  name: prisma
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: prisma
+    spec:
+      containers:
+      - env:
+        - name: PRISMA_CONFIG
+          value: |
+            port: 4466
+            databases:
+              default:
+                connector: postgres
+                host: db
+                port: 5432
+                user: prisma
+                password: prisma
+                migrations: true
+        image: prismagraphql/prisma:1.29
+        name: prisma
+        ports:
+        - containerPort: 4466
+        resources: {}
+      restartPolicy: Always
+status: {}

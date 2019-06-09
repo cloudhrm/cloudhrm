@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.16.0 (0c01309)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: auth
+  name: auth
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: auth
+    spec:
+      containers:
+      - env:
+        - name: CONSUL_HOST
+          value: consul
+        - name: NODE_ENV
+          value: production
+        - name: PRISMA_CLOUD_SESSION_KEY
+        - name: PRISMA_HOST
+          value: prisma
+        - name: PRISMA_PATH
+          value: /auth/dev
+        - name: PRISMA_PORT
+          value: "4466"
+        - name: PRISMA_PROT
+          value: http
+        image: cloudhrm/auth:latest
+        name: auth
+        ports:
+        - containerPort: 4000
+        resources: {}
+      restartPolicy: Always
+status: {}
